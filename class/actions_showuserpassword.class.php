@@ -59,30 +59,38 @@ class Actionsshowuserpassword
 	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
 	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
 	 */
-	function doActions($parameters, &$object, &$action, $hookmanager)
+	function formObjectOptions($parameters, &$object, &$action, $hookmanager)
 	{
-		$error = 0; // Error counter
-		$myvalue = 'test'; // A result value
-
-		print_r($parameters);
-		echo "action: " . $action;
-		print_r($object);
-
-		if (in_array('somecontext', explode(':', $parameters['context'])))
-		{
-		  // do something only for the context 'somecontext'
+		global $conf, $user, $langs;
+		
+		if(!empty($user->admin) && empty($conf->global->DATABASE_PWD_ENCRYPTED)) {
+			
+			?>
+				<script type="text/javascript">
+					$(document).ready(function() {
+			<?php
+			
+			if($action === 'view' || $action === 'update' || empty($action)) {
+				
+				?>
+					$td = $('.tabBar tr:nth(1) td:nth(1)');
+					$td.text('<?php echo $object->pass;	?>');
+				<?php
+				
+			} elseif($action === 'edit') {
+				
+				?>
+					$('[name=password]').attr('type', 'text');
+				<?php	
+				
+			}
+			
+			?>
+					});
+				</script>
+			<?php
+			
 		}
-
-		if (! $error)
-		{
-			$this->results = array('myreturn' => $myvalue);
-			$this->resprints = 'A text to show';
-			return 0; // or return 1 to replace standard code
-		}
-		else
-		{
-			$this->errors[] = 'Error message';
-			return -1;
-		}
+		
 	}
 }
